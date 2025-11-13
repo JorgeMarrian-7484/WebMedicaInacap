@@ -6,3 +6,5 @@ def inicio (request):
     return render(request,'index.html')
 def login (request):
     return render(request,'components/login.html')
+def register(request):
+    return render(request, 'components/register.html')
