@@ -52,3 +52,10 @@ class AgendaModel (models.Model):
     class Meta:
         unique_together = ['fk_medico','fecha','hora_inicio']
 
+class ExpedienteModel(models.Model):
+    id_expediente = models.IntegerField(primary_key = True)
+    fk_paciente = models.ForeignKey(PacienteModel, on_delete = models.RESTRICT)
+    nombre = models.CharField(max_length = 15)
+    descripcion = models.TextField()
+
+
