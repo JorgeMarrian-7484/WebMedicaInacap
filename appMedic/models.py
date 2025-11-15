@@ -3,42 +3,53 @@ from django.db import models
 # Create your models here.
 
 class PacienteModel(models.Model):
-    id_paciente = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=30)
     rut = models.CharField(max_length=9)
-    correo = models.EmailField(max_lenght=150)
-    telefono = models.IntegerField(max_length=10)
+    correo = models.EmailField(max_length=150)
+    telefono = models.IntegerField()
     direccion = models.CharField(max_length=50)
     def __str__(self):
-        return self.rut
+        return f"{self.nombre} - {self.rut}"
     class Meta:
         db_table = 'paciente'
 
+#Esta clase tendra su formulario, quien tendra acceso solamente el admin
+
 class MedicoModel (models.Model):
-    id_medico = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=30)
     correo = models.EmailField()
-    telefono = models.IntegerField(max_length=10)
+    telefono = models.IntegerField()
     especialidad = models.CharField(max_length=15)
+    def __str__(self):
+        return f"{self.nombre} - {self.especialidad}"
+    class Meta:
+        db_table = 'medico'
 
 
 #Revisar como funciona esta clase en particular (Fuente: IA Deepseek)... Recuerda agregar un comentario, explicando las funciones desconocidas y como se relacionan
-class HorarioMedicoModel (models.Model):
-    fk_medico = models.ForeignKey(MedicoModel, on_delete=models.RESTRICT, related_name='horarios')
-    dia_semana = [
-        (0, 'Lunes'),
-        (1, 'Martes'),
-        (2, 'Miercoles'),
-        (3, 'Jueves'),
-        (4, 'Viernes'),
+
+# Esta clase solo podra tener acceso el medico. EL ADMIN NO DEBE PODER CAMBIAR SUS HORARIOS
+class HorarioMedicoModel(models.Model):
+    DIAS_SEMANA = [
+        (1, 'Lunes'),
+        (2, 'Martes'),
+        (3, 'Miércoles'),
+        (4, 'Jueves'),
+        (5, 'Viernes'),
     ]
-    fecha_select = models.IntegerField(choices=dia_semana)
+    
+    fk_medico = models.ForeignKey('MedicoModel', on_delete=models.RESTRICT, related_name='horarios')
+    dia_semana = models.IntegerField(choices=DIAS_SEMANA)
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
     activo = models.BooleanField(default=True)
     class Meta:
-        unique_together = ['fk_medico','fecha_select','hora_inicio']
-        ordering = ['fecha_select','hora_inicio']
+        unique_together = ['fk_medico','dia_semana','hora_inicio']
+        ordering = ['dia_semana','hora_inicio']
+        verbose_name = 'Horario Médico'                 #Investigar que es estas funciones
+        verbose_name_plural = 'Horarios Médicos'        #esta igual
+    def __str__(self):
+        return f"{self.fk_medico.nombre} - {self.get_dia_semana_display()} {self.hora_inicio}-{self.hora_fin}"
 
 #Revisar esta clase relacionada con "HorarioMedicoModel", por si llegara a recibir un error
 class AgendaModel (models.Model):
@@ -57,5 +68,8 @@ class ExpedienteModel(models.Model):
     fk_paciente = models.ForeignKey(PacienteModel, on_delete = models.RESTRICT)
     nombre = models.CharField(max_length = 15)
     descripcion = models.TextField()
+
+
+#Agregar modelos de administracion con integracion de medicos. LOS MEDICOS DEBEN SER REGISTRADOS POR EL ADMINISTRADOR DE LA WEB...  
 
 

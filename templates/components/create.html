@@ -1,0 +1,29 @@
+{% extends 'index.html' %} 
+{% load static %}
+{% block contenido %}
+<!-- verificamos si trae mensaje para mostrarlo en un sweetalert -->
+{% if messages %}    
+    {% for msj in messages %}
+        <script>
+            Swal.fire('{{ msj }}','','success').then(()=>{
+                window.location.href = '{{ ruta }}'
+            })
+        </script>
+    {% endfor %}        
+{% endif %}
+    
+    <h1 class="alert alert-secondary text-center mt-3">{{ titulo }}</h1>
+    <form method="post">
+        <!-- csrf token permite que los datos sólo sean enviados por áca  -->
+        {% csrf_token %}
+        <!-- form carga todo el formulario traido desde view -->
+        {{ form }}
+        <div class="mt-3 text-center">
+            <input type="reset" class="btn btn-outline-info w-25" value="Limpiar">
+            <input type="submit" class="btn btn-success w-25" value="Guardar">
+        </div>
+    </form>
+
+    <a href="{{ ruta }}" class="btn btn-outline-dark">Volver</a>
+{% endblock  %}
+    

@@ -1,0 +1,35 @@
+{% extends 'index.html' %}
+
+{% block contenido %}    
+<h2>
+    {{categoria}}
+</h2>
+<div>
+    {{titulo}}
+</div>
+{% if medico %}
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Medico tb</th>
+                <th>Especialidad</th>
+                <th>Correo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for m in medico %}
+
+                <tr>
+                    <td>{{m.nombre}}</td>
+                    <td>{{m.especialidad}}</td>
+                    <td>{{m.correo}}</td>
+                </tr>
+                
+            {% endfor %}
+                
+        </tbody>
+    </table>
+{% endif %}
+{% endblock contenido %}

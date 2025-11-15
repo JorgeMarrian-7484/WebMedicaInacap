@@ -1,0 +1,42 @@
+{% extends 'index.html' %}
+{% block contenido %}
+<h2>
+    {{categoria}}
+</h2>
+
+<div>
+    {{titulo}}
+</div>
+{% if horario %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Medico</th>
+                <th>Dias</th>
+                <th>Horas de inicio</th>
+                <th>Hora de termino</th>
+                <th></th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for h in horario %}
+
+                <tr>
+                    <td>{{h.fk_medico.nombre}}</td>
+                    <td>{{h.get_dia_semana_display}}</td>
+                    <td>{{h.hora_inicio|time:'H:i'}}</td>
+                    <td>{{h.hora_fin|time:'H:i'}}</td>
+                </tr>
+                
+            {% endfor %}
+                
+        </tbody>
+    </table>
+</div>
+    
+{% endif %}
+{% endblock contenido %}

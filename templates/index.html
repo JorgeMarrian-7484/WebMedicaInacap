@@ -18,10 +18,27 @@
             <div class="navbar-nav">
                 <a href="{% url 'login' %}" class="nav-link">Iniciar sesion</a>
             <a href="" class="nav-link">ver especialidades</a>
+            <a href="{% url 'crearHorario' %}" class="nav-link">crear horario</a>
+            <a href="{% url 'crearMedico' %}" class="nav-link">Ingresar medicos</a>
+            <a href="{% url 'horario' %}" class="nav-link">lista de horarios</a>
+            <a href="{% url 'medico' %}" class="nav-link">listar medico</a>
             </div>
-            
         </div>
     </nav>
+        
+<div class="container">
+    {% block contenido %}
+    <h2>Texto que debera cambiar</h2>
+    {% endblock contenido %}
+</div>
+
+<div>
+    <ul>
+        <ol>
+            <a href="{% url 'cpaciente' %}">Ingresar pacientes</a>
+        </ol>
+    </ul>
+</div>
         
 </body>
 </html>
