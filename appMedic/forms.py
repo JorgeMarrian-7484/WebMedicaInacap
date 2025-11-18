@@ -36,11 +36,22 @@ class PacienteForms (forms.ModelForm):
             'correo': forms.EmailInput(attrs={'class':'form-control'}),
         }
 
-class AgendaForms (forms.ModelForm):
+class AgendaForms(forms.ModelForm):
     class Meta:
         model = AgendaModel
-        fields = '__all__'
+        fields = ['fk_horario', 'fk_paciente', 'fecha']
         widgets = {
-            'fk_medico':forms.Select(attrs={'class':'form-control'}),
-            'fecha':forms.DateInput(attrs={'class':'form-control', 'type':'time'})
+            'fk_horario': forms.Select(attrs={'class':'form-select'}),
+            'fk_paciente': forms.Select(attrs={'class':'form-select'}),
+            'fecha': forms.DateInput(attrs={
+                'class': 'form-control', 
+                'type': 'date'  # Tipo corregido
+            })
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtrar solo horarios activos
+        self.fields['fk_horario'].queryset = HorarioMedicoModel.objects.filter(activo=True)
+        # Ordenar pacientes por nombre
+        self.fields['fk_paciente'].queryset = PacienteModel.objects.all().order_by('nombre')

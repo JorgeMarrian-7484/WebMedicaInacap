@@ -77,10 +77,10 @@ class AgendaModel(models.Model):
         return self.fk_horario.fk_medico
 
 class ExpedienteModel(models.Model):
-    id_expediente = models.IntegerField(primary_key = True)
-    fk_paciente = models.ForeignKey(PacienteModel, on_delete = models.RESTRICT)
-    nombre = models.CharField(max_length = 15)
+    fk_paciente = models.ForeignKey(PacienteModel, on_delete=models.RESTRICT)
+    nombre = models.CharField(max_length=15)
     descripcion = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
 
 #Agregar modelos de administracion con integracion de medicos. LOS MEDICOS DEBEN SER REGISTRADOS POR EL ADMINISTRADOR DE LA WEB...  

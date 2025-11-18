@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from appMedic.models import AgendaModel,MedicoModel,ExpedienteModel, HorarioMedicoModel,PacienteModel
 from appMedic.forms import MedicoForms, HorarioForms,PacienteForms,AgendaForms
 from django.contrib import messages
@@ -78,9 +78,26 @@ def cpaciente (request):
 
 def agendar(request):
     form = AgendaForms()
+    if request.method == 'POST':
+        form = AgendaForms(request.POST)
+        if form.is_valid():
+            # Validar disponibilidad antes de guardar
+            cita = form.save(commit=False)
+            # Verificar si la cita ya existe
+            if AgendaModel.objects.filter(
+                fk_horario=cita.fk_horario, 
+                fecha=cita.fecha
+            ).exists():
+                messages.error(request, 'Esta cita ya está ocupada')
+                
+            else:
+                cita.save()
+                messages.success(request, 'Cita agendada exitosamente')
+                return redirect('paciente')  # Redirige a lista de pacientes
+    
     data = {
-        'titulo':'Crear cita medica',
+        'titulo': 'Crear cita médica',
         'form': form,
-        'agendar': agendar
+        'ruta': '/components/paciente'  # Ruta corregida
     }
-    return render(request,'components/create.html',data)
+    return render(request, 'components/create.html', data)

@@ -2,7 +2,7 @@
 {% load static %}
 {% block contenido %}
 <!-- verificamos si trae mensaje para mostrarlo en un sweetalert -->
-{% if messages %}    
+<!-- {% if messages %}    
     {% for msj in messages %}
         <script>
             Swal.fire('{{ msj }}','','success').then(()=>{
@@ -10,7 +10,7 @@
             })
         </script>
     {% endfor %}        
-{% endif %}
+{% endif %} -->
     
     <h1 class="alert alert-secondary text-center mt-3">{{ titulo }}</h1>
     <form method="post">
