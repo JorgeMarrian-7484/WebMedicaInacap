@@ -1,5 +1,5 @@
 from django.urls import path
-from appMedic.views import login,cmedico,chorario,horario,medico, paciente, cpaciente
+from appMedic.views import login,cmedico,chorario,horario,medico, paciente, cpaciente, agendar
 
 urlpatterns = [
     path('IniciarSesion/',login,name='login'),
@@ -8,6 +8,7 @@ urlpatterns = [
     path('crearHorario/',chorario,name='crearHorario'),
     path('medico/',medico,name='medico'),
     path('paciente/',paciente, name= 'paciente'),
-    path('crearPaciente/',cpaciente, name='cpaciente')
+    path('crearPaciente/',cpaciente, name='cpaciente'),
+    path('agendarCita/',agendar, name='agendar')
 
 ]

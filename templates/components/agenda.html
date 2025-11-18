@@ -1,0 +1,21 @@
+{% extends 'index.html' %}
+
+
+{% block contenido %}
+<h2>{{titulo}}</h2>
+<div>
+    <h3>Agendar cita</h3>
+</div>
+<div>
+    <h1></h1>
+    <form method="post">
+        {% csrf_token %}
+        {{form}}
+        <div>
+            <input type="submit" value="Agendar">
+        </div>
+    </form>
+</div>
+<a href="" > Volver</a>
+{% endblock contenido %}
+    

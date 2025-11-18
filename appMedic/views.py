@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from appMedic.models import AgendaModel,MedicoModel,ExpedienteModel, HorarioMedicoModel,PacienteModel
-from appMedic.forms import MedicoForms, HorarioForms,PacienteForms
+from appMedic.forms import MedicoForms, HorarioForms,PacienteForms,AgendaForms
 from django.contrib import messages
 
 # Create your views here.
@@ -76,5 +76,11 @@ def cpaciente (request):
             messages.success(request,'Paciente Registrado')
     return render (request,'components/create.html',data)
 
-def agendar():
-    return
+def agendar(request):
+    form = AgendaForms()
+    data = {
+        'titulo':'Crear cita medica',
+        'form': form,
+        'agendar': agendar
+    }
+    return render(request,'components/create.html',data)

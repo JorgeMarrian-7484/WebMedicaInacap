@@ -1,5 +1,5 @@
 from django import forms
-from appMedic.models import MedicoModel, HorarioMedicoModel, PacienteModel
+from appMedic.models import MedicoModel, HorarioMedicoModel, PacienteModel, AgendaModel
 
 #Clases para horarios de los medicos
 
@@ -34,4 +34,13 @@ class PacienteForms (forms.ModelForm):
             'nombre':forms.TextInput(attrs={'class':'form-control'}),
             'rut':forms.TextInput(attrs={'class':'form-control'}),
             'correo': forms.EmailInput(attrs={'class':'form-control'}),
+        }
+
+class AgendaForms (forms.ModelForm):
+    class Meta:
+        model = AgendaModel
+        fields = '__all__'
+        widgets = {
+            'fk_medico':forms.Select(attrs={'class':'form-control'}),
+            'fecha':forms.DateInput(attrs={'class':'form-control', 'type':'time'})
         }

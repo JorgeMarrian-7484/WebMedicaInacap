@@ -26,7 +26,6 @@ class MedicoModel (models.Model):
         db_table = 'medico'
 
 
-#Revisar como funciona esta clase en particular (Fuente: IA Deepseek)... Recuerda agregar un comentario, explicando las funciones desconocidas y como se relacionan
 
 # Esta clase solo podra tener acceso el medico. EL ADMIN NO DEBE PODER CAMBIAR SUS HORARIOS
 class HorarioMedicoModel(models.Model):
@@ -52,16 +51,30 @@ class HorarioMedicoModel(models.Model):
         return f"{self.fk_medico.nombre} - {self.get_dia_semana_display()} {self.hora_inicio}-{self.hora_fin}"
 
 #Revisar esta clase relacionada con "HorarioMedicoModel", por si llegara a recibir un error
-class AgendaModel (models.Model):
-    id_agenda = models.IntegerField(primary_key=True)
-    fk_medico = models.ForeignKey(MedicoModel,related_name='agendas', on_delete=models.RESTRICT)
+class AgendaModel(models.Model):
+    fk_horario = models.ForeignKey(
+        HorarioMedicoModel, 
+        on_delete=models.CASCADE,
+        related_name='citas_agendadas'
+    )
+    fk_paciente = models.ForeignKey(
+        PacienteModel, 
+        null=True, blank=True, 
+        on_delete=models.SET_NULL
+    )
     fecha = models.DateField()
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
     disponible = models.BooleanField(default=True)
-    fk_paciente = models.ForeignKey(PacienteModel, null=True, blank=True, on_delete=models.SET_NULL)
+    
     class Meta:
-        unique_together = ['fk_medico','fecha','hora_inicio']
+        unique_together = ['fk_horario', 'fecha'] 
+        ordering = ['fecha', 'fk_horario__hora_inicio']
+    
+    def __str__(self):
+        return f"Cita {self.fecha} - Dr.{self.fk_horario.fk_medico.nombre}"
+    
+    @property
+    def fk_medico(self):
+        return self.fk_horario.fk_medico
 
 class ExpedienteModel(models.Model):
     id_expediente = models.IntegerField(primary_key = True)
