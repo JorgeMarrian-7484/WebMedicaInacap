@@ -1,4 +1,6 @@
 django
-mysql-connector-python
+PyMySQL
 pillow
 xlwt 
+django
+mysql-connector-python

@@ -1,39 +1,206 @@
-<!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - MediWeb</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <script src="{% static 'js/sweetalert2.js' %}"></script>
-    <title>Iniciar sesion</title>
-    
+    <link rel="stylesheet" href="{% static 'css/medicine.css' %}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #003d82 0%, #0056b3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .login-card h2 {
+            text-align: center;
+            color: #003d82;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        .login-card .form-control {
+            border: 2px solid #e8f4f8;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .login-card .form-control:focus {
+            border-color: #003d82;
+            box-shadow: 0 0 0 0.2rem rgba(0, 61, 130, 0.25);
+            background-color: #f0f8ff;
+        }
+        
+        .login-card .form-label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #003d82 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 61, 130, 0.3);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .login-link a {
+            color: #003d82;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        
+        .errorlist li {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .form-check {
+            margin-bottom: 15px;
+        }
+        
+        .form-check-input {
+            border-color: #e8f4f8;
+        }
+        
+        .form-check-input:checked {
+            background-color: #003d82;
+            border-color: #003d82;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <a href="{% url 'inicio' %}">Volver</a>
-    </nav>
-    <div class="container">
-        <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
-        </div>
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label for="inputPassword6" class="col-form-label">Password</label>
+    <div class="login-container">
+        <div class="login-card">
+            <h2>🔐 Iniciar Sesión</h2>
+            
+            <!-- Mensaje de error de autenticación -->
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>¡Error!</strong> {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+            
+            <!-- Mensajes de error del formulario -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error:</strong>
+                    {% for error in form.non_field_errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+            
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Usuario o Correo</label>
+                    <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                           id="id_username" name="username" 
+                           placeholder="Tu usuario o correo" required autofocus>
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.username.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                           id="id_password" name="password" 
+                           placeholder="Tu contraseña" required>
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="id_remember" name="remember">
+                    <label class="form-check-label" for="id_remember">Recuérdame</label>
+                </div>
+
+                <button type="submit" class="login-btn">Iniciar Sesión</button>
+            </form>
+
+            <div class="login-link">
+                <p>¿No tienes cuenta? <a href="{% url 'registro' %}">Registrarse aquí</a></p>
             </div>
-            <div class="col-auto">
-                <input type="password" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline">
-            </div>
-            <div class="col-auto">
-                <span id="passwordHelpInline" class="form-text">
-                Must be 8-20 characters long.
-                </span>
-            </div>
-            <a href="" >No tienes una cuenta registrada?</a>
         </div>
     </div>
-    
+
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
 </body>
 </html>
-    

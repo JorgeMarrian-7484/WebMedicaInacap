@@ -1,42 +1,93 @@
 {% extends 'index.html' %}
+{% load static %}
+
 {% block contenido %}
-<h2>
-    {{categoria}}
-</h2>
 
-<div>
-    {{titulo}}
+<div class="page-title">
+    <h2>📅 {{ titulo }}</h2>
 </div>
+
+<div class="mb-3">
+    <a href="{% url 'crearHorario' %}" class="btn btn-primary">
+        ➕ Crear Nuevo Horario
+    </a>
+    {% if es_admin %}
+    <a href="{% url 'exportarHorariosExcel' %}" class="btn btn-success" title="Descargar en Excel">
+        📊 Exportar a Excel
+    </a>
+    {% elif es_medico %}
+    <a href="{% url 'exportarHorariosExcel' %}" class="btn btn-success" title="Descargar en Excel">
+        📊 Exportar a Excel
+    </a>
+    {% endif %}
+</div>
+
 {% if horario %}
-
-<div class="table-responsive">
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Medico</th>
-                <th>Dias</th>
-                <th>Horas de inicio</th>
-                <th>Hora de termino</th>
-                <th></th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            
-            {% for h in horario %}
-
+    <div class="table-wrapper">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{h.fk_medico.nombre}}</td>
-                    <td>{{h.get_dia_semana_display}}</td>
-                    <td>{{h.hora_inicio|time:'H:i'}}</td>
-                    <td>{{h.hora_fin|time:'H:i'}}</td>
+                    <th>Médico</th>
+                    <th>Especialidad</th>
+                    <th>Día de la Semana</th>
+                    <th>Hora Inicio</th>
+                    <th>Hora Fin</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
-                
-            {% endfor %}
-                
-        </tbody>
-    </table>
-</div>
-    
+            </thead>
+            <tbody>
+                {% for h in horario %}
+                    <tr>
+                        <td><strong>{{ h.fk_medico.nombre }}</strong></td>
+                        <td>{{ h.fk_medico.especialidad }}</td>
+                        <td>
+                            <span class="badge" style="background-color: #0d6efd; color: white;">
+                                {{ h.get_dia_semana_display }}
+                            </span>
+                        </td>
+                        <td class="text-center">{{ h.hora_inicio|time:'H:i' }}</td>
+                        <td class="text-center">{{ h.hora_fin|time:'H:i' }}</td>
+                        <td class="text-center">
+                            {% if h.activo %}
+                                <span class="badge" style="background-color: #198754; color: white;">
+                                    ✅ Activo
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background-color: #dc3545; color: white;">
+                                    ❌ Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if es_admin or es_medico %}
+                            <div class="btn-group-actions">
+                                <a href="{% url 'editarHorario' h.id %}" class="btn btn-info btn-sm">
+                                    ✏️ Editar
+                                </a>
+                                <a href="{% url 'eliminarHorario' h.id %}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('¿Estás seguro de que deseas eliminar este horario?')">
+                                    🗑️ Eliminar
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 text-center">
+        <p class="text-muted">Total de horarios registrados: <strong>{{ horario|length }}</strong></p>
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">
+        <strong>No hay horarios registrados.</strong><br>
+        <a href="{% url 'crearHorario' %}" class="btn btn-primary mt-2">
+            ➕ Crear el primer horario
+        </a>
+    </div>
 {% endif %}
+
 {% endblock contenido %}

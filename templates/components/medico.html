@@ -1,35 +1,103 @@
 {% extends 'index.html' %}
+{% load static %}
 
-{% block contenido %}    
-<h2>
-    {{categoria}}
-</h2>
-<div>
-    {{titulo}}
+{% block contenido %}
+
+<div class="page-title">
+    <h2>👨‍⚕️ {{ titulo }}</h2>
 </div>
-{% if medico %}
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Medico tb</th>
-                <th>Especialidad</th>
-                <th>Correo</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            {% for m in medico %}
 
+<div class="mb-3">
+    {% if es_admin %}
+    <a href="{% url 'crearMedico' %}" class="btn btn-primary">
+        ➕ Registrar Nuevo Médico
+    </a>
+    <a href="{% url 'exportarMedicosExcel' %}" class="btn btn-info" title="Descargar en Excel">
+        📊 Exportar a Excel
+    </a>
+    {% endif %}
+</div>
+
+{% if medico %}
+    <div class="table-wrapper">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{m.nombre}}</td>
-                    <td>{{m.especialidad}}</td>
-                    <td>{{m.correo}}</td>
+                    <th>Nombre</th>
+                    <th>Especialidad</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Estado de Cuenta</th>
+                    {% if es_admin %}<th>Rol/Usuario</th>{% endif %}
+                    <th class="text-center">Acciones</th>
                 </tr>
-                
-            {% endfor %}
-                
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for m in medico %}
+                    <tr>
+                        <td><strong>{{ m.nombre }}</strong></td>
+                        <td>
+                            <span class="badge" style="background-color: #0d6efd; color: white;">
+                                {{ m.especialidad }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ m.correo }}">{{ m.correo }}</a>
+                        </td>
+                        <td>{{ m.telefono }}</td>
+                        <td>
+                            {% if m.user %}
+                                <span class="badge" style="background-color: #198754; color: white;">
+                                    ✅ Activa
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background-color: #6c757d; color: white;">
+                                    ⚠️ Sin Cuenta
+                                </span>
+                            {% endif %}
+                        </td>
+                        {% if es_admin %}
+                        <td>
+                            {% if m.user %}
+                                <span class="badge" style="background-color: #17a2b8; color: white;">
+                                    👤 {{ m.user.username }}
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background-color: #ffc107; color: black;">
+                                    ⚠️ No asignado
+                                </span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td class="text-center">
+                            {% if es_admin or es_medico %}
+                            <div class="btn-group-actions">
+                                <a href="{% url 'editarMedico' m.id %}" class="btn btn-info btn-sm">
+                                    ✏️ Editar
+                                </a>
+                                <a href="{% url 'eliminarMedico' m.id %}" class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('¿Estás seguro de que deseas eliminar a {{ m.nombre }}?')">
+                                    🗑️ Eliminar
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-4 text-center">
+        <p class="text-muted">Total de médicos registrados: <strong>{{ medico|length }}</strong></p>
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">
+        <strong>No hay médicos registrados.</strong><br>
+        <a href="{% url 'crearMedico' %}" class="btn btn-primary mt-2">
+            ➕ Registrar el primer médico
+        </a>
+    </div>
 {% endif %}
+
 {% endblock contenido %}

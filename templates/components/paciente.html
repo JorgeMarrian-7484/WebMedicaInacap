@@ -1,41 +1,87 @@
 {% extends 'index.html' %}
+{% load static %}
+
 {% block contenido %}
-<h2>
-    {{categoria}}
-</h2>
 
-<div>
-    {{titulo}}
+<div class="page-title">
+    <h2>👥 {{ titulo }}</h2>
 </div>
+
+<div class="mb-3">
+    <a href="{% url 'cpaciente' %}" class="btn btn-primary">
+        ➕ Registrar Nuevo Paciente
+    </a>
+    <a href="{% url 'agendar' %}" class="btn btn-success">
+        📅 Agendar Cita
+    </a>
+    {% if es_admin %}
+    <a href="{% url 'exportarPacientesExcel' %}" class="btn btn-info" title="Descargar en Excel">
+        📊 Exportar a Excel
+    </a>
+    <a href="{% url 'exportarAgendaExcel' %}" class="btn btn-warning" title="Descargar agenda en Excel">
+        📋 Exportar Agenda
+    </a>
+    {% elif es_medico %}
+    <a href="{% url 'exportarAgendaExcel' %}" class="btn btn-warning" title="Descargar agenda en Excel">
+        📋 Exportar Agenda
+    </a>
+    {% endif %}
+</div>
+
 {% if paciente %}
-
-<div class="table-responsive">
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Nombre Completo</th>
-                <th>Rut</th>
-                <th>Correo</th>
-                <th></th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            
-            {% for p in paciente %}
-
+    <div class="table-wrapper">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{p.nombre}}</td>
-                    <td>{{p.rut}}</td>
-                    <td>{{p.correo}}</td>
-                    <td></td>
+                    <th>Nombre Completo</th>
+                    <th>RUT</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
-                
-            {% endfor %}
-                
-        </tbody>
-    </table>
-</div>
-    
+            </thead>
+            <tbody>
+                {% for p in paciente %}
+                    <tr>
+                        <td><strong>{{ p.nombre }}</strong></td>
+                        <td>
+                            <span class="badge" style="background-color: #6c757d; color: white;">
+                                {{ p.rut }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ p.correo }}">{{ p.correo }}</a>
+                        </td>
+                        <td>{{ p.telefono }}</td>
+                        <td>{{ p.direccion }}</td>
+                        <td class="text-center">
+                            <div class="btn-group-actions">
+                                <a href="{% url 'editarPaciente' p.id %}" class="btn btn-info btn-sm">
+                                    ✏️ Editar
+                                </a>
+                                <a href="{% url 'eliminarPaciente' p.id %}" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('¿Estás seguro de que deseas eliminar a {{ p.nombre }}?')">
+                                    🗑️ Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 text-center">
+        <p class="text-muted">Total de pacientes registrados: <strong>{{ paciente|length }}</strong></p>
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">
+        <strong>No hay pacientes registrados.</strong><br>
+        <a href="{% url 'cpaciente' %}" class="btn btn-primary mt-2">
+            ➕ Registrar el primer paciente
+        </a>
+    </div>
 {% endif %}
+
 {% endblock contenido %}

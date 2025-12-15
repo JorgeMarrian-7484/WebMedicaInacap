@@ -1,47 +1,226 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu principal</title>
+    <title>{% block titulo %}Sistema Médico{% endblock %}</title>
     <script src="{% static 'js/sweetalert2.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/medicine.css' %}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
-            <a href="">
-                <img src="" alt="Logo" style="width:40px;">
+            <a href="{% url 'inicio' %}" class="navbar-brand">
+                <i class="bi bi-hospital"></i> MediWeb
             </a>
-            <a href="{% url 'inicio' %}" class="navbar-brand">Medicina</a>
-            <div class="navbar-nav">
-                <a href="{% url 'login' %}" class="nav-link">Iniciar sesion</a>
-            <a href="" class="nav-link">ver especialidades</a>
-            <a href="{% url 'crearHorario' %}" class="nav-link">crear horario</a>
-            <a href="{% url 'crearMedico' %}" class="nav-link">Ingresar medicos</a>
-            <a href="{% url 'horario' %}" class="nav-link">lista de horarios</a>
-            <a href="{% url 'medico' %}" class="nav-link">listar medico</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <!-- Menú para usuarios autenticados -->
+                        <a href="{% url 'inicio' %}" class="nav-link">Inicio</a>
+                        
+                        {% if es_admin or es_medico or es_paciente %}
+                            <a href="{% url 'medico' %}" class="nav-link">Médicos</a>
+                        {% endif %}
+                        
+                        {% if es_admin or es_medico %}
+                            <a href="{% url 'horario' %}" class="nav-link">Horarios</a>
+                            <a href="{% url 'paciente' %}" class="nav-link">Pacientes</a>
+                        {% endif %}
+                        
+                        <a href="{% url 'agendar' %}" class="nav-link">Agendar Cita</a>
+                        
+                        <!-- Usuario y logout -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👤 {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="#">🔑 Mi Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">🚪 Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <!-- Menú para usuarios no autenticados -->
+                        <a href="{% url 'login' %}" class="nav-link">Iniciar Sesión</a>
+                        <a href="{% url 'registro' %}" class="nav-link btn-primary ms-2" style="padding: 0.5rem 1rem; border-radius: 5px; color: white !important;">Registrarse</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
-        
-<div class="container">
-    {% block contenido %}
-    <h2>Texto que debera cambiar</h2>
-    {% endblock contenido %}
-</div>
 
-<div>
-    <ul>
-        <li>
-            <a href="{% url 'cpaciente' %}">Ingresar pacientes</a>
-        </li>
-        <li>
-            <a href="{% url 'agendar' %}">Reservar cita</a>
-        </li>
-    </ul>
-</div>
-        
+    <!-- MENSAJES DE ALERTA -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <script>
+                Swal.fire({
+                    icon: '{{ message.tags|default:"info" }}',
+                    title: 'Notificación',
+                    text: '{{ message }}',
+                    confirmButtonColor: '#0d6efd'
+                });
+            </script>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main>
+        <div class="container animated">
+            {% block contenido %}
+            {% if user.is_authenticated %}
+                <!-- Dashboard para usuarios autenticados -->
+                <div class="hero-section">
+                    <h1>👋 Bienvenido, {{ user.first_name|default:user.username }}!</h1>
+                    <p>
+                        {% if es_admin %}
+                            Sistema Médico - <span style="color: #dc3545;"><strong>Administrador</strong></span>
+                        {% elif es_medico %}
+                            Sistema Médico - <span style="color: #0d6efd;"><strong>Médico</strong></span>
+                        {% elif es_paciente %}
+                            Sistema Médico - <span style="color: #198754;"><strong>Paciente</strong></span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="links-section">
+                    <!-- Opciones disponibles para Admin -->
+                    {% if es_admin %}
+                        <a href="{% url 'medico' %}" class="link-card">
+                            <h3>👨‍⚕️ Médicos</h3>
+                            Ver y gestionar médicos
+                        </a>
+                        <a href="{% url 'crearMedico' %}" class="link-card">
+                            <h3>➕ Nuevo Médico</h3>
+                            Registrar nuevo médico
+                        </a>
+                        <a href="{% url 'paciente' %}" class="link-card">
+                            <h3>👥 Pacientes</h3>
+                            Gestionar pacientes
+                        </a>
+                        <a href="{% url 'cpaciente' %}" class="link-card">
+                            <h3>➕ Nuevo Paciente</h3>
+                            Registrar nuevo paciente
+                        </a>
+                        <a href="{% url 'horario' %}" class="link-card">
+                            <h3>📅 Horarios</h3>
+                            Ver y crear horarios
+                        </a>
+                        <a href="{% url 'crearHorario' %}" class="link-card">
+                            <h3>⏰ Nuevo Horario</h3>
+                            Crear horario médico
+                        </a>
+                        <a href="{% url 'agendar' %}" class="link-card">
+                            <h3>📝 Agendar Cita</h3>
+                            Gestionar citas
+                        </a>
+                        <a href="{% url 'usuarios' %}" class="link-card">
+                            <h3>👥 Usuarios del Sistema</h3>
+                            Ver roles y permisos
+                        </a>
+                    <!-- Opciones disponibles para Médicos -->
+                    {% elif es_medico %}
+                        <a href="{% url 'medico' %}" class="link-card">
+                            <h3>👨‍⚕️ Médicos</h3>
+                            Ver médicos registrados
+                        </a>
+                        <a href="{% url 'paciente' %}" class="link-card">
+                            <h3>👥 Pacientes</h3>
+                            Ver pacientes
+                        </a>
+                        <a href="{% url 'cpaciente' %}" class="link-card">
+                            <h3>➕ Nuevo Paciente</h3>
+                            Registrar nuevo paciente
+                        </a>
+                        <a href="{% url 'horario' %}" class="link-card">
+                            <h3>📅 Horarios</h3>
+                            Ver horarios médicos
+                        </a>
+                        <a href="{% url 'agendar' %}" class="link-card">
+                            <h3>📝 Mis Citas</h3>
+                            Ver y gestionar citas
+                        </a>
+                    <!-- Opciones disponibles para Pacientes -->
+                    {% elif es_paciente %}
+                        <a href="{% url 'medico' %}" class="link-card">
+                            <h3>👨‍⚕️ Médicos Disponibles</h3>
+                            Ver médicos especializados
+                        </a>
+                        <a href="{% url 'horario' %}" class="link-card">
+                            <h3>📅 Horarios</h3>
+                            Ver horarios disponibles
+                        </a>
+                        <a href="{% url 'agendar' %}" class="link-card">
+                            <h3>📝 Agendar Cita</h3>
+                            Reservar cita médica
+                        </a>
+                        <a href="{% url 'misCitas' %}" class="link-card">
+                            <h3>📋 Mis Citas</h3>
+                            Ver mis citas programadas
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <!-- Contenido para usuarios no autenticados -->
+                <div class="hero-section">
+                    <h1>Bienvenido al Sistema Médico</h1>
+                    <p>Por favor, inicia sesión para acceder al sistema</p>
+                </div>
+
+                <div class="links-section">
+                    <a href="{% url 'login' %}" class="link-card">
+                        <h3>🔑 Iniciar Sesión</h3>
+                        Accede a tu cuenta
+                    </a>
+                    <a href="{% url 'registro' %}" class="link-card">
+                        <h3>📝 Crear Cuenta</h3>
+                        Registrarse en el sistema
+                    </a>
+                </div>
+            {% endif %}
+            {% endblock contenido %}
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 Sistema Médico MediWeb. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script>
+        // Inicializar tooltips y dropdowns de Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar todos los dropdowns
+            const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+            dropdownElements.forEach(el => {
+                new bootstrap.Dropdown(el);
+            });
+
+            // Cerrar alertas automáticamente después de 5 segundos
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html>
